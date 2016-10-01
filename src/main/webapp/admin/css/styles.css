@@ -1,0 +1,70 @@
+.container-fluid {
+	width: 80%;
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 15px;
+}
+
+.table>tbody>tr>td,.table>tbody>tr>th,.table>tfoot>tr>td,.table>tfoot>tr>th,.table>thead>tr>td,.table>thead>tr>th
+	{
+	vertical-align: middle;
+}
+
+.full button span {
+	background-color: limegreen;
+	border-radius: 32px;
+	color: black;
+}
+
+.partially button span {
+	background-color: orange;
+	border-radius: 32px;
+	color: black;
+}
+
+.multi-row {
+	margin-bottom: 10px;
+}
+
+.multi-row-input {
+	float: left;
+	width: 90%;
+	margin-right: 10px;
+}
+
+.label-ember {
+	color: orange;
+}
+
+.thumbnail {
+	border: none;
+	display: inline-block;
+}
+
+.thumbnail>img {
+	margin-left: 0;
+	height: 200px;
+	display: inline;
+}
+
+.img-circle.avator {
+	height: 120px;
+	width: 120px;
+}
+
+.form-label {
+	display: block;
+	width: 100%;
+	height: 34px;
+	padding: 6px 12px;
+}
+
+.ui-grid-cell-contents {
+    line-height: 40px;
+}
+
+.ui-grid-cell-contents>.btn {
+	margin: 2px;
+}

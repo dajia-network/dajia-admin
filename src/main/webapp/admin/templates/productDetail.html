@@ -1,0 +1,226 @@
+<nav class="navbar navbar-default navbar-static-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a href="#" class="navbar-brand">打价网管理后台</a>
+		</div>
+		<div class="navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="#/products">产品</a></li>
+				<li><a href="#/orders">订单</a></li>
+				<li><a href="#/clients">用户</a></li>
+				<li><a href="#/sales">推广</a></li>
+				<li><a href="#/stats">统计</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<div class="container">
+	<div>
+		<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
+	</div>
+	<form class="form-horizontal" id="productForm" ng-submit="submit()">
+		<div class="form-group">
+			<label for="name" class="col-sm-2 control-label">产品名*</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="name" ng-model="product.name" ng-required="true">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="name" class="col-sm-2 control-label">产品简称* (用于分享产品时显示)</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="shortName" ng-model="product.shortName" ng-required="true">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="brief" class="col-sm-2 control-label">产品描述</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="brief" placeholder="对产品的简单描述"
+					ng-model="product.brief">
+			</div>
+		</div>
+		<div class="form-group" flow-init flow-name="homeImgUploader.flow" flow-file-success="homeImgUploadSuccess($message)">
+			<label for="brief" class="col-sm-2 control-label">首页图片</label>
+			<div class="col-sm-10">
+			    <div class="thumbnail" ng-hide="product.imgUrl!=null">
+			      <img class="img-thumbnail" src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=no+image" />
+			    </div>
+			    <div class="thumbnail" ng-show="product.imgUrl!=null">
+			      <img class="img-thumbnail" ng-src="{{product.imgUrl}}" />
+			    </div>
+			    <div>
+			      <span class="btn btn-default" ng-hide="product.imgUrl" flow-btn flow-attrs="{accept:'image/*'}">选择</span>
+			      <span class="btn btn-default" ng-show="product.imgUrl" flow-btn flow-attrs="{accept:'image/*'}">更改</span>
+			      <span class="btn btn-danger" ng-show="product.imgUrl" ng-click="homeImgDelete()">删除</span>
+       			  <span class="btn btn-primary" ng-click="homeImgUpload()">上传</button>
+			    </div>
+			</div>
+		</div>
+		<div class="form-group" flow-init flow-name="otherImgUploader.flow" flow-file-success="otherImgUploadSuccess($message)">
+			<label for="brief" class="col-sm-2 control-label">其他产品图片</label>
+			<div class="col-sm-10">
+			    <div class="thumbnail" ng-hide="product.productImages!=null&&product.productImages.length>0">
+			      <img class="img-thumbnail" src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=no+image" />
+			    </div>
+			    <div ng-show="product.productImages!=null&&product.productImages.length>0">
+			   		<div class="thumbnail" ng-repeat="image in product.productImages" ng-switch="$last">
+						<img class="img-thumbnail" ng-src="{{image.url}}" />
+						<button ng-switch-when="false" type="button" class="btn btn-default" ng-click="switchImgOrder(image.imgId)">
+							<span class="glyphicon glyphicon-transfer"></span>
+						</button>
+			   		</div>
+			    </div>
+			    <div>
+			      <span class="btn btn-default" flow-btn flow-attrs="{accept:'image/*'}">选择</span>
+			      <span class="btn btn-danger" ng-show="product.productImages!=null&&product.productImages.length>0" ng-click="otherImgDelete()">删除</span>
+       			  <span class="btn btn-primary" ng-click="otherImgUpload()">上传</button>
+			    </div>
+			</div>
+		</div>
+		<div class="form-group" flow-init flow-name="descImgUploader.flow" flow-file-success="descImgUploadSuccess($message)">
+			<label for="brief" class="col-sm-2 control-label">产品详情</label>
+			<div class="col-sm-10">
+				    <div>
+				    	<p>请在此上传产品详情图片，然后将图片链接复制插入富文本编辑框内。</p>
+				    	<p ng-repeat="img in descImages">{{img}}</p>
+				    </div>
+				    <div>
+				      <span class="btn btn-default" flow-btn flow-attrs="{accept:'image/*'}">选择</span>
+				      <span class="btn btn-danger" ng-show="descImgUploader.flow.files.length" ng-click="descImgDelete()">删除</span>
+	       			  <span class="btn btn-primary" ng-click="descImgUpload()">上传</button>
+			    </div>
+			    <p/>
+				<div text-angular ng-model="product.description"></div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="buyQuota" class="col-sm-2 control-label">购买限制</label>
+			<div class="col-sm-10">
+				<input type="number" class="form-control" id="buyQuota" placeholder="一个用户最多购买几件，留空为无限制" ng-model="product.buyQuota">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="stock" class="col-sm-2 control-label">库存*</label>
+			<div class="col-sm-10">
+				<input type="number" class="form-control" id="stock" placeholder="库存数量" ng-model="product.stock" ng-required="true">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="sold" class="col-sm-2 control-label">销量</label>
+			<div class="col-sm-10">
+				<input type="number" class="form-control" id="sold" ng-model="product.sold" readonly>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="startDate" class="col-sm-2 control-label">开始日期*</label>
+			<div class="col-sm-10">
+				<input type="datetime-local" class="form-control" id="startDate" ng-model="product.startDate" uib-datepicker-popup ng-required="true" />
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="expiredDate" class="col-sm-2 control-label">截止日期*</label>
+			<div class="col-sm-10">
+				<input type="datetime-local" class="form-control" id="expiredDate" ng-model="product.expiredDate" uib-datepicker-popup ng-required="true" />
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="postFee" class="col-sm-2 control-label">运费*</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<div class="input-group-addon">￥</div>
+					<number-only-input id="postFee" input-value="product.postFee" ng-required="true"/>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="currentPrice" class="col-sm-2 control-label">当前价格</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<div class="input-group-addon">￥</div>
+					<input type="number" class="form-control" id="currentPrice" ng-model="product.currentPrice"
+						readonly>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="originalPrice" class="col-sm-2 control-label">原始价格*</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<div class="input-group-addon">￥</div>
+					<number-only-input id="originalPrice" input-value="product.originalPrice" ng-required="true"/>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="currentPrice" class="col-sm-2 control-label">价格变化规则*</label>
+			<div class="col-sm-10">
+				<div class="multi-row" ng-repeat="price in product.prices">
+					<div class="input-group multi-row-input">
+						<input type="number" class="form-control" ng-model="price.sold">
+						<div class="input-group-addon">￥</div>
+						<number-only-input id="originalPrice" placeholder="目标价格" input-value="price.targetPrice"/>
+					</div>
+					<div>
+						<button type="button" class="btn btn-default" ng-click="removePrice(price.priceId);">删除</button>
+					</div>
+				</div>
+				<div class="input-group multi-row-input">
+					<input type="number" class="form-control" placeholder="销售数量" ng-model="newSold">
+					<div class="input-group-addon">￥</div>
+					<number-only-input id="originalPrice" placeholder="目标价格" input-value="newPrice"/>
+				</div>
+				<div>
+					<button type="button" class="btn btn-default" ng-click="addPrice();">添加</button>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="currentPrice" class="col-sm-2 control-label">产品状态</label>
+			<div class="col-sm-10">
+				<label>
+					<input type="radio" ng-model="product.productStatus" value="1">
+					下架&nbsp;
+				</label>
+				<label>
+					<input type="radio" ng-model="product.productStatus" value="2">
+					上架&nbsp;
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="currentPrice" class="col-sm-2 control-label">是否置顶</label>
+			<div class="col-sm-10">
+				<label>
+					<input type="radio" ng-model="product.fixTop" value="1">
+					是&nbsp;
+				</label>
+				<label>
+					<input type="radio" ng-model="product.fixTop" value="0">
+					否&nbsp;
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="currentPrice" class="col-sm-2 control-label">是否参与打群架推广</label>
+			<div class="col-sm-10">
+				<label>
+					<input type="radio" ng-model="product.isPromoted" value="Y">
+					是&nbsp;
+				</label>
+				<label>
+					<input type="radio" ng-model="product.isPromoted" value="N">
+					否&nbsp;
+				</label>
+			</div>
+		</div>
+					
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" class="btn btn-primary">提交修改</button>
+				<button type="button" ng-if="product.productStatus==3" class="btn btn-primary" ng-click="republish();">开始新一轮打价</button>
+				<a class="btn btn-default" href="#" role="button">返回</a>
+				<button type="button" class="btn btn-default" ng-click="go2Kdt(product.refId);">修改产品图片和介绍</button>
+			</div>
+		</div>
+	</form>
+</div>

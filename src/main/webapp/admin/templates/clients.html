@@ -1,0 +1,37 @@
+<nav class="navbar navbar-default navbar-static-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a href="#" class="navbar-brand">打价网管理后台</a>
+		</div>
+		<div class="navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="#/products">产品</a></li>
+				<li><a href="#/orders">订单</a></li>
+				<li class="active"><a href="#/clients">用户</a></li>
+				<li><a href="#/sales">推广</a></li>
+				<li><a href="#/stats">统计</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<div class="container">
+	<div class="input-group">
+	    <span class="input-group-btn">
+	      <button class="btn btn-default" type="button" ng-click="loadPage(1);">搜索</button>
+	    </span>
+	    <input type="text" my-enter="loadPage(1);" class="form-control" ng-model="keyword.value" placeholder="输入用户名">
+    </div>
+    <p></p>
+	<div class="gridStyle" ui-grid="gridOptions"></div>
+	<nav>
+		<ul class="pagination">
+			<li ng-class="{true: 'active', false: 'disabled'}[pager.hasPrev]"><a href ng-click="loadPage(pager.currentPage-1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+			
+			<li ng-class="{true: 'active', false: ''}[pager.currentPage==n]" ng-repeat="n in pager.pageRange"><a href ng-click="loadPage(n)">{{n}}</a></li>
+			
+			<li ng-class="{true: 'active', false: 'disabled'}[pager.hasNext]"><a href ng-click="loadPage(pager.currentPage+1)" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+			</a></li>
+		</ul>
+	</nav>
+</div>
