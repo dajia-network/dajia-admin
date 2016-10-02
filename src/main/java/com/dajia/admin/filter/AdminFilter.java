@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.dajia.util.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +37,35 @@ public class AdminFilter implements Filter {
 
 		HttpServletResponse response = (HttpServletResponse) res;
 		String reqUrl = request.getRequestURI();
-		if (!reqUrl.endsWith(".css") && !reqUrl.endsWith(".js") && !reqUrl.endsWith(".html")
-				&& !reqUrl.endsWith(".htm")) {
+		if (!isStatic(reqUrl)) {
 			if (null == loginUser || null == loginUser.userId || null == loginUser.isAdmin
-					|| !loginUser.isAdmin.equals("Y")) {
-//				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				// response.sendRedirect("/adminLogin");
+					|| !loginUser.isAdmin.equals(CommonUtils.Y)) {
+
+				if(!isSkipped(reqUrl))
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		}
 		chain.doFilter(req, res);
+	}
+
+	private boolean isStatic(String requestUrl) {
+		return requestUrl.endsWith(".css") ||
+				requestUrl.endsWith(".js") ||
+				requestUrl.endsWith(".html") ||
+				requestUrl.endsWith(".htm") ||
+				requestUrl.endsWith(".jpg") ||
+				requestUrl.endsWith(".png") ||
+				requestUrl.endsWith(".ico") ||
+				requestUrl.endsWith(".gif") ||
+				requestUrl.endsWith(".xls") ||
+				requestUrl.endsWith(".xlsx") ;
+	}
+
+	private boolean isSkipped(String requestUrl) {
+		return requestUrl.contains("/admin/signupCheck") ||
+				requestUrl.contains("/admin/signinSms") ||
+				requestUrl.contains("/admin/login") ||
+				requestUrl.contains("/admin/logout") ;
 	}
 
 	public void destroy() {

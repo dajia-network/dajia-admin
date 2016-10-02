@@ -1,20 +1,3 @@
-<nav class="navbar navbar-default navbar-static-top">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<a href="#" class="navbar-brand">打价网管理后台</a>
-		</div>
-		<div class="navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="#/products">产品</a></li>
-				<li class="active"><a href="#/orders">订单</a></li>
-				<li><a href="#/clients">用户</a></li>
-				<li><a href="#/sales">推广</a></li>
-				<li><a href="#/stats">统计</a></li>
-			</ul>
-		</div>
-	</div>
-</nav>
-
 <div class="container">
 	<div>
 		<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>

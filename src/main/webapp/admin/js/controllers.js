@@ -519,7 +519,9 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 .controller('SignInCtrl', function($scope, $rootScope, $http, $window, $timeout, $q) {
 	$scope.login = {
 		'mobile' : null,
-		'signinCode' : null
+		'signinCode' : null,
+		'username' : null,
+		'password' : null
 	};
 	$scope.alerts = [];
 	$scope.smsBtnTxt = '发送手机验证码';
@@ -528,7 +530,8 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 
 	var checkMobile = function(mobile) {
 		var defer = $q.defer();
-		$http.get('/signupCheck/' + mobile).success(function(data, status, headers, config) {
+		$scope.alerts = [];
+		$http.get('/admin/signupCheck/' + mobile).success(function(data, status, headers, config) {
 			if ("failed" == data.result) {
 				defer.resolve(true);
 			} else {
@@ -546,6 +549,7 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 	}
 
 	$scope.getSigninCode = function() {
+		$scope.alerts = [];
 		var mobile = $scope.login.mobile;
 		var mobileReg = /^((13[0-9]|15[0-9]|18[0-9])+\d{8})$/;
 
@@ -564,6 +568,7 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 	}
 
 	$scope.submit = function() {
+		$scope.alerts = [];
 		if (!$scope.login.mobile || !$scope.login.signinCode) {
 			$scope.alerts.push({
 				type : 'danger',
@@ -571,8 +576,8 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 			});
 			return;
 		}
-
-		$http.post('/smslogin', $scope.login).success(function(data, status, headers, config) {
+		$scope.login.loginType = "mobile";
+		$http.post('/admin/login', $scope.login).success(function(data, status, headers, config) {
 			if (data == null || data.length == 0 || data.isAdmin != 'Y') {
 				$scope.loginFail();
 			} else {
@@ -587,12 +592,40 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 		});
 
 	};
+
+	$scope.loginWithUserPass = function() {
+		$scope.alerts = [];
+		if (!$scope.login.userName || !$scope.login.password) {
+			$scope.alerts.push({
+				type: 'danger',
+				msg: '请输入用户名或密码'
+			});
+			return ;
+		}
+		$scope.login.loginType = "userPass";
+		$http.post("/admin/login", $scope.login).success(function(data) {
+			if (data == null || data.length == 0 || data.isAdmin != 'Y') {
+				$scope.loginFail();
+			} else {
+				$scope.alerts.push({
+					type : 'success',
+					msg : '登录成功'
+				});
+				window.location.href = "#";
+			}
+		}).error(function(){
+			$scope.loginFail();
+		});
+	}
+
 	$scope.loginFail = function() {
+		$scope.alerts = [];
 		$scope.alerts.push({
 			type : 'danger',
 			msg : '登录失败。密码错误或没有管理员权限'
 		});
 	}
+	
 	$scope.closeAlert = function(index) {
 		$scope.alerts.splice(index, 1);
 	}

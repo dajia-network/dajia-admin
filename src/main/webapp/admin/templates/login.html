@@ -7,29 +7,60 @@
 </nav>
 
 <div class="container">
-	<div>
-		<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
+	<div class="row">
+		<div class="span4">
+
+			<uib-tabset active="active" style="width:80%;margin:0 auto">
+				<div uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" ng-class="'alert-' + (alert.type || 'warning')" close="closeAlert($index)">{{alert.msg}}</div>
+				<uib-tab index="0" heading="手机登录">
+					<br/>
+					<form class="form-horizontal" id="signInForm" ng-submit="submit()">
+						<div class="form-group">
+							<label for="mobile" class="col-sm-5 control-label">用户手机</label>
+							<div class="col-sm-2">
+								<input type="text" class="form-control" id="mobile" ng-model="login.mobile">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="signinCode" class="col-sm-5 control-label">短信验证码</label>
+							<div class="col-sm-2">
+								<input type="text" class="form-control" id="signinCode" ng-model="login.signinCode">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-offset-5 col-sm-5">
+								<button type="button" class="btn btn-default" id="smsBtn" ng-disabled="smsBtnDisable" ng-click="getSigninCode()">{{smsBtnTxt}}</button>
+								<button type="submit" class="btn btn-primary">登录</button>
+							</div>
+						</div>
+					</form>
+				</uib-tab>
+				<uib-tab index="1" heading="密码登录">
+					<br/>
+					<form class="form-horizontal" id="form_login_with_user_pass" ng-submit="loginWithUserPass()">
+						<div class="form-group">
+							<label for="userName" class="col-sm-5 control-label">用户名</label>
+							<div class="col-sm-2">
+								<input type="text" class="form-control" id="userName" ng-model="login.userName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-sm-5 control-label">密码</label>
+							<div class="col-sm-2">
+								<input type="password" class="form-control" id="password" ng-model="login.password">
+							</div>
+						</div>
+						<input type="hidden" id="sign" />
+						<div class="form-group">
+							<div class="col-sm-offset-5 col-sm-5">
+								<button type="submit" class="btn btn-primary">登录</button>
+							</div>
+						</div>
+					</form>
+				</uib-tab>
+			</uib-tabset>
+		</div>
 	</div>
-	<form class="form-horizontal" id="signInForm" ng-submit="submit()">
-		<div class="form-group">
-			<label for="mobile" class="col-sm-5 control-label">用户手机</label>
-			<div class="col-sm-2">
-				<input type="text" class="form-control" id="mobile" ng-model="login.mobile">
-			</div>
-		</div>
-		<div class="form-group">
-			<label for="signinCode" class="col-sm-5 control-label">短信验证码</label>
-			<div class="col-sm-2">
-				<input type="text" class="form-control" ng-model="login.signinCode">
-			</div>
-		</div>
-					
-		<div class="form-group">
-			<div class="col-sm-offset-5 col-sm-5">
-				<button type="button" class="btn btn-default" id="smsBtn" ng-disabled="smsBtnDisable" ng-click="getSigninCode()">{{smsBtnTxt}}</button>
-				<button type="submit" class="btn btn-primary">登录</button>
-			</div>
-		</div>
-	</form>
 </div>
 

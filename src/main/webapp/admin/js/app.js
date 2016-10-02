@@ -42,7 +42,11 @@ angular.module(
 		cache : false,
 		templateUrl : './templates/login.html',
 		controller : 'SignInCtrl'
-	}).otherwise('/products')
+	})
+		.when('/hahaha', {
+			redirectTo:"/login"
+		})
+		.otherwise('/products')
 } ]).service('authInterceptor', function($q) {
 	var service = this;
 	service.responseError = function(response) {
