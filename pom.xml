@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.dajia.core</groupId>
             <artifactId>dajia-data</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${version.dajia-data}</version>
         </dependency>
     </dependencies>
 
