@@ -41,8 +41,9 @@ public class AdminFilter implements Filter {
 			if (null == loginUser || null == loginUser.userId || null == loginUser.isAdmin
 					|| !loginUser.isAdmin.equals(CommonUtils.Y)) {
 
-				if(!isSkipped(reqUrl))
+				if(!isSkipped(reqUrl)) {
 					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				}
 			}
 		}
 		chain.doFilter(req, res);

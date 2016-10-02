@@ -46,7 +46,7 @@ public class AdminLoginController {
     private final static Logger logger = LoggerFactory.getLogger("AdminLog");
 
 
-    @RequestMapping("/signinSms/{mobile}")
+    @RequestMapping("/admin/signinSms/{mobile}")
     public @ResponseBody ReturnVO signinSms(@PathVariable("mobile") String mobile) {
         String result = smsService.sendSigninMessage(mobile, true);
         ReturnVO rv = new ReturnVO();

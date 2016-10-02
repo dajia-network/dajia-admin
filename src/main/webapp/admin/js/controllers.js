@@ -562,7 +562,7 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 		}
 		checkMobile(mobile).then(function(mobileValid) {
 			if (mobileValid) {
-				sendSmsMessage($scope, $http, $timeout, '/signinSms/', mobile);
+				sendSmsMessage($scope, $http, $timeout, '/admin/signinSms/', mobile);
 			}
 		});
 	}
@@ -625,7 +625,7 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 			msg : '登录失败。密码错误或没有管理员权限'
 		});
 	}
-	
+
 	$scope.closeAlert = function(index) {
 		$scope.alerts.splice(index, 1);
 	}
