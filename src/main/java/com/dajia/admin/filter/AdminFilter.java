@@ -40,7 +40,7 @@ public class AdminFilter implements Filter {
 				&& !reqUrl.endsWith(".htm")) {
 			if (null == loginUser || null == loginUser.userId || null == loginUser.isAdmin
 					|| !loginUser.isAdmin.equals("Y")) {
-//				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				// response.sendRedirect("/adminLogin");
 			}
 		}

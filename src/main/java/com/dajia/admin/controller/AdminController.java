@@ -1,28 +1,54 @@
 package com.dajia.admin.controller;
 
-import com.dajia.domain.*;
-import com.dajia.repository.ProductItemRepo;
-import com.dajia.repository.ProductRepo;
-import com.dajia.repository.UserOrderRepo;
-import com.dajia.repository.UserRepo;
-import com.dajia.service.*;
-import com.dajia.util.CommonUtils;
-import com.dajia.util.CommonUtils.OrderStatus;
-import com.dajia.util.UserUtils;
-import com.dajia.vo.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import net.sf.ehcache.Cache;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dajia.domain.Price;
+import com.dajia.domain.Product;
+import com.dajia.domain.ProductItem;
+import com.dajia.domain.User;
+import com.dajia.domain.UserOrder;
+import com.dajia.repository.ProductItemRepo;
+import com.dajia.repository.ProductRepo;
+import com.dajia.repository.UserOrderRepo;
+import com.dajia.repository.UserRepo;
+import com.dajia.service.OrderService;
+import com.dajia.service.ProductService;
+import com.dajia.service.RefundService;
+import com.dajia.service.SmsService;
+import com.dajia.service.StatService;
+import com.dajia.service.UserService;
+import com.dajia.util.CommonUtils;
+import com.dajia.util.CommonUtils.OrderStatus;
+import com.dajia.util.UserUtils;
+import com.dajia.vo.LoginUserVO;
+import com.dajia.vo.OrderFilterVO;
+import com.dajia.vo.OrderVO;
+import com.dajia.vo.PaginationVO;
+import com.dajia.vo.ProductVO;
+import com.dajia.vo.ReturnVO;
+import com.dajia.vo.SalesVO;
 
 @RestController
 public class AdminController {
@@ -51,6 +77,12 @@ public class AdminController {
 
 	@Autowired
 	private StatService statService;
+
+	@Autowired
+	private SmsService smsService;
+
+	@Autowired
+	EhCacheCacheManager ehcacheManager;
 
 	@RequestMapping("/admin/robotorder/{pid}")
 	public @ResponseBody UserOrder robotOrder(@PathVariable("pid") Long pid) {
@@ -328,7 +360,7 @@ public class AdminController {
 	}
 
 	protected User getLoginUser(HttpServletRequest request, HttpServletResponse response, UserRepo userRepo,
-								boolean returnFailCode) {
+			boolean returnFailCode) {
 		User user = null;
 		HttpSession session = request.getSession(true);
 		LoginUserVO loginUser = (LoginUserVO) session.getAttribute(UserUtils.session_user);
@@ -344,5 +376,43 @@ public class AdminController {
 			return null;
 		}
 		return user;
+	}
+
+	@RequestMapping(value = "/smslogin", method = RequestMethod.POST)
+	public @ResponseBody LoginUserVO userSmsLogin(@RequestBody LoginUserVO loginUser, HttpServletRequest request,
+			HttpServletResponse response) {
+		if (null != ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code)) {
+			Cache cache = ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code);
+			String signinCode = cache.get(loginUser.mobile).getObjectValue().toString();
+			logger.info(signinCode);
+			if (null == signinCode || !signinCode.equals(loginUser.signinCode)) {
+				return null;
+			}
+			loginUser.loginIP = CommonUtils.getRequestIP(request);
+			loginUser.loginDate = new Date();
+
+			User user = userService.userLogin(loginUser.mobile, loginUser.password, request, true);
+			loginUser = UserUtils.addLoginSession(loginUser, user, request);
+
+			return loginUser;
+		} else {
+			return null;
+		}
+	}
+
+	@RequestMapping("/signupCheck/{mobile}")
+	public @ResponseBody ReturnVO signupCheck(@PathVariable("mobile") String mobile) {
+		String result = userService.checkMobile(mobile);
+		ReturnVO rv = new ReturnVO();
+		rv.result = result;
+		return rv;
+	}
+
+	@RequestMapping("/signinSms/{mobile}")
+	public @ResponseBody ReturnVO signinSms(@PathVariable("mobile") String mobile) {
+		String result = smsService.sendSigninMessage(mobile, true);
+		ReturnVO rv = new ReturnVO();
+		rv.result = result;
+		return rv;
 	}
 }
