@@ -395,6 +395,9 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 			}, {
 				code : 'yunda',
 				name : '韵达快递'
+			}, {
+				code : 'huitongkuaidi',
+				name : '百世汇通'
 			} ];
 			$http.get('/admin/order/' + $routeParams.orderId).success(
 					function(data, status, headers, config) {
@@ -597,10 +600,10 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 		$scope.alerts = [];
 		if (!$scope.login.userName || !$scope.login.password) {
 			$scope.alerts.push({
-				type: 'danger',
-				msg: '请输入用户名或密码'
+				type : 'danger',
+				msg : '请输入用户名或密码'
 			});
-			return ;
+			return;
 		}
 		$scope.login.loginType = "userPass";
 		$http.post("/admin/login", $scope.login).success(function(data) {
@@ -613,7 +616,7 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 				});
 				window.location.href = "#";
 			}
-		}).error(function(){
+		}).error(function() {
 			$scope.loginFail();
 		});
 	}
