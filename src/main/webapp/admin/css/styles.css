@@ -68,3 +68,11 @@
 .ui-grid-cell-contents>.btn {
 	margin: 2px;
 }
+
+.dropdown-menu {
+	min-width:0;
+}
+
+.dropdown-menu > a {
+	color: red;
+}

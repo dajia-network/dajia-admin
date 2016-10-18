@@ -43,10 +43,22 @@ angular.module(
 		templateUrl : './templates/login.html',
 		controller : 'SignInCtrl'
 	})
-		.when('/hahaha', {
-			redirectTo:"/login"
+	.when('/preference/changePassword', {
+		cache : false,
+		templateUrl : './templates/changePassword.html',
+		controller: 'PreferenceCtrl'
+	})
+		.when("/preference/changePasswordSuccess", {
+			cache: false,
+			templateUrl:'./templates/changePasswordSuccess.html',
+			controller:'PreferenceCtrl'
 		})
-		.otherwise('/products')
+		.when("/preference/changePasswordFail",  {
+			cache: false,
+			templateUrl:'./templates/changePasswordFail.html',
+			controller:'PreferenceCtrl'
+		})
+	.otherwise('/products')
 } ]).service('authInterceptor', function($q) {
 	var service = this;
 	service.responseError = function(response) {

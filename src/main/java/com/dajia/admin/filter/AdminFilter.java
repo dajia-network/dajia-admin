@@ -49,7 +49,20 @@ public class AdminFilter implements Filter {
 		chain.doFilter(req, res);
 	}
 
+	/**
+	 * 是否是模板文件 默认模板文件也需要登录 但是需要跳过 login.html
+	 * @param url
+	 * @return
+	 */
+	private boolean isTemplateUrl(String url) {
+		return url.startsWith("/admin/templates/");
+	}
+
 	private boolean isStatic(String requestUrl) {
+		if (isTemplateUrl(requestUrl)) {
+			return false;
+		}
+
 		return requestUrl.endsWith(".css") ||
 				requestUrl.endsWith(".js") ||
 				requestUrl.endsWith(".html") ||
@@ -66,7 +79,8 @@ public class AdminFilter implements Filter {
 		return requestUrl.contains("/admin/signupCheck") ||
 				requestUrl.contains("/admin/signinSms") ||
 				requestUrl.contains("/admin/login") ||
-				requestUrl.contains("/admin/logout") ;
+				requestUrl.contains("/admin/logout") ||
+				requestUrl.contains("/admin/templates/login.html");
 	}
 
 	public void destroy() {

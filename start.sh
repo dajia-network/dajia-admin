@@ -1,12 +1,8 @@
-#application_properties=`find src -name application.properties -print`
+# 把dajia数据库替换成dajia_test
+application_properties=`find src -name application.properties -print`
 
-#sed 's/3306\/dajia\?/3306\/dajia_test\?/g' $application_properties > /tmp/sed.a
-#mv /tmp/sed.a $application_properties
-
-#scheduler_src_file=`find src -name ScheduledTasks.java`
-
-#sed '/@Scheduled/d' $scheduler_src_file  > /tmp/sed.b
-#mv /tmp/sed.b $scheduler_src_file
+sed 's/3306\/dajia\?/3306\/dajia_test\?/g' $application_properties > /tmp/sed.a
+mv /tmp/sed.a $application_properties
 
 echo ""
 echo ""

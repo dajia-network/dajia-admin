@@ -1,5 +1,6 @@
 package com.dajia.admin.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,12 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.dajia.domain.Price;
 import com.dajia.domain.Product;
@@ -357,6 +353,27 @@ public class AdminController {
 	@RequestMapping(value = "/admin/stats/{page}", method = RequestMethod.GET)
 	public PaginationVO<OrderVO> statsByPage(@PathVariable("page") Integer pageNum) {
 		return statService.getRewardStatsByPage(pageNum);
+	}
+
+
+	@RequestMapping(value = "/admin/preference/changePassword", method= RequestMethod.POST)
+	public void changeAdminPassword(@RequestParam(value="currentPassword", required = false) String currentPassword, @RequestParam(value="newPassword", required=false) String newPassword, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		logger.info("admin change password, currentPass is {}, newPass is {}", currentPassword, newPassword);
+		LoginUserVO loginUserVO = (LoginUserVO) request.getSession(true).getAttribute(UserUtils.session_user);
+		if (null == loginUserVO) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+
+		Long userId = loginUserVO.userId;
+		boolean result = userService.updateUserPassword(userId, currentPassword, newPassword);
+
+		if(result) {
+			response.sendRedirect("/admin/index.html#/preference/changePasswordSuccess");
+		} else {
+			response.sendRedirect("/admin/index.html#/preference/changePasswordFail");
+		}
 	}
 
 	protected User getLoginUser(HttpServletRequest request, HttpServletResponse response, UserRepo userRepo,

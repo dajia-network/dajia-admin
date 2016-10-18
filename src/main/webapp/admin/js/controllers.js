@@ -632,7 +632,29 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 	$scope.closeAlert = function(index) {
 		$scope.alerts.splice(index, 1);
 	}
-});
+})
+
+.controller ('PreferenceCtrl',  function($scope, $rootScope, $http) {
+	var ss = $scope;
+	ss.checkPass = function() {
+		ss.isNewPasswordError = ss.newPassword == undefined || ss.newPassword == null || ss.newPassword.trim() == "";
+		ss.checkConfirmNewPassword();
+	};
+
+	ss.checkConfirmNewPassword = function() {
+		ss.isConfirmNewPasswordMissing = ss.confirmNewPassword == undefined || ss.confirmNewPassword == null || ss.confirmNewPassword.trim() == "";
+		ss.isConfirmNewPasswordNotMatch = !ss.isConfirmNewPasswordMissing && ss.confirmNewPassword !== ss.newPassword;
+		ss.isConfirmNewPasswordError = ss.isConfirmNewPasswordMissing || ss.isConfirmNewPasswordNotMatch;
+	}
+
+	$scope.checkCurrentPassword = function() {
+		var a = ss.currentPassword;
+		ss.isCurrentPasswordMissing = a == undefined || a == null || a.trim() == "";
+		ss.isCurrentPasswordError = ss.isCurrentPasswordMissing;
+	}
+})
+
+;
 
 var sendSmsMessage = function($scope, $http, $timeout, methodPath, mobile) {
 	var counter = 30;
