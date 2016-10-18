@@ -6,14 +6,26 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 	};
 	$scope.loadPage = function(pageNum) {
 		console.log($scope.keyword);
+		if($scope.pager == undefined) {
+			$scope.pager = {
+				currentPage : 1
+			}
+		}
 		$http.post('/admin/products/' + pageNum, $scope.keyword).success(function(data, status, headers, config) {
 			$scope.pager = data;
 			$scope.products = data.results;
 			$scope.gridOptions.data = $scope.products;
+
+			$scope.alerts = [];
 		}).error(function(data, status, headers, config) {
 			console.log('request failed...');
 		});
-	}
+	};
+
+	$scope.reloadCurrentPage = function() {
+		$scope.loadPage($scope.pager.currentPage);
+	};
+
 	$scope.loadPage(1);
 	$scope.gridOptions = {
 		rowHeight : 50,
@@ -52,9 +64,7 @@ angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function
 				type : 'success',
 				msg : '机器打价成功'
 			});
-			$timeout(function() {
-				$route.reload();
-			}, 1000);
+			$scope.reloadCurrentPage();
 		}).error(function(data, status, headers, config) {
 			console.log('request failed...');
 			$scope.alerts.push({
