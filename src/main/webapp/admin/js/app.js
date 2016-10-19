@@ -58,7 +58,12 @@ angular.module(
 			templateUrl:'./templates/changePasswordFail.html',
 			controller:'PreferenceCtrl'
 		})
-	.otherwise('/products')
+		.when("/products/:pageId", {
+			cache: false,
+			templateUrl:'./templates/products.html',
+			controller:'ProductsCtrl'
+		})
+		.otherwise('/products')
 } ]).service('authInterceptor', function($q) {
 	var service = this;
 	service.responseError = function(response) {

@@ -19,7 +19,7 @@
 		<ul class="pagination">
 			<li ng-class="{true: 'active', false: 'disabled'}[pager.hasPrev]"><a href ng-click="loadPage(pager.currentPage-1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
 
-			<li ng-class="{true: 'active', false: ''}[pager.currentPage==n]" ng-repeat="n in pager.pageRange"><a href ng-click="loadPage(n)">{{n}}</a></li>
+			<li ng-class="{true: 'active', false: ''}[pager.currentPage==n]" ng-repeat="n in pager.pageRange"><a href="#/products/{{n}}">{{n}}</a></li>
 
 			<li ng-class="{true: 'active', false: 'disabled'}[pager.hasNext]"><a href ng-click="loadPage(pager.currentPage+1)" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 			</a></li>

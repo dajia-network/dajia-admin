@@ -8,32 +8,47 @@ angular.module('dajiaAdmin.controllers', [])
 		$rootScope.TAB_STATS = 16;
 		$rootScope.TAB_NONE = 0;
 		$rootScope.isPrimaryTabActive = function(e) {
-			console.log("is active " + e);
+			// console.log("is active " + e);
 			return $rootScope.actived_primary_tab & e;
 		};
 		$rootScope.setActivePrimaryTab = function(e) {
 			console.log("set active " + e);
 			$rootScope.actived_primary_tab = e;
 		};
+		$rootScope.LAST_URL = "#";
 	})
-	.controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout) {
+	.controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout, $routeParams) {
 		$scope.syncBtnTxt = '同步数据';
 		$scope.keyword = {
 			value : ''
 		};
+
+		/** init **/
+		if($scope.pager == undefined) {
+			var c = $routeParams.pageId;
+			if(!c || c <=0 ) {
+				c = 1;
+			}
+
+			$scope.pager = {
+				currentPage : c
+			}
+			console.log("current page inited to " + $scope.pager.currentPage);
+		}
+
 		$scope.loadPage = function(pageNum) {
 			console.log($scope.keyword);
-			if($scope.pager == undefined) {
-				$scope.pager = {
-					currentPage : 1
-				}
-			}
+			$scope.alerts = [{type:"info", msg:"数据更新中 ..."}];
 			$http.post('/admin/products/' + pageNum, $scope.keyword).success(function(data, status, headers, config) {
 				$scope.pager = data;
 				$scope.products = data.results;
 				$scope.gridOptions.data = $scope.products;
+				$scope.alerts = [{type:'success', msg: '数据已更新 @' + new Date().Format("yyyy-MM-dd hh:mm:ss")}];
+				$rootScope.LAST_URL = "#/products/" + pageNum;
 
-				$scope.alerts = [];
+				// $timeout(function() {
+				// 	$scope.alerts = [];
+				// }, 1000);
 			}).error(function(data, status, headers, config) {
 				console.log('request failed...');
 			});
@@ -41,9 +56,10 @@ angular.module('dajiaAdmin.controllers', [])
 
 		$scope.reloadCurrentPage = function() {
 			$scope.loadPage($scope.pager.currentPage);
+			console.log("current page reloaded");
 		};
 
-		$scope.loadPage(1);
+		$scope.reloadCurrentPage();
 		$scope.gridOptions = {
 			rowHeight : 50,
 			appScope : $scope,
@@ -204,7 +220,7 @@ angular.module('dajiaAdmin.controllers', [])
 
 .controller(
 		'ProductDetailCtrl',
-		function($scope, $http, $routeParams, $route, $window) {
+		function($scope, $rootScope, $http, $routeParams, $route, $window) {
 			console.log('ProductDetailCtrl...');
 			$scope.descImages = [];
 			$http.get('/admin/product/' + $routeParams.pid).success(function(data, status, headers, config) {
@@ -302,7 +318,7 @@ angular.module('dajiaAdmin.controllers', [])
 					}
 					$http.post('/admin/product/' + $routeParams.pid, $scope.product).success(
 							function(data, status, headers, config) {
-								window.location = '#';
+								window.location.href = $rootScope.LAST_URL;
 							}).error(function(data, status, headers, config) {
 						console.log('product update failed...');
 					});
