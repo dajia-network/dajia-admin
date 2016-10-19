@@ -1,91 +1,108 @@
-angular.module('dajiaAdmin.controllers', []).controller('ProductsCtrl', function($scope, $http, $route, $timeout) {
-	console.log('ProductsCtrl...');
-	$scope.syncBtnTxt = '同步数据';
-	$scope.keyword = {
-		value : ''
-	};
-	$scope.loadPage = function(pageNum) {
-		console.log($scope.keyword);
-		if($scope.pager == undefined) {
-			$scope.pager = {
-				currentPage : 1
+angular.module('dajiaAdmin.controllers', [])
+	.run(function($rootScope) {
+		$rootScope.actived_primary_tab = 1;
+		$rootScope.TAB_PRODUCT = 1;
+		$rootScope.TAB_ORDER = 2;
+		$rootScope.TAB_CLIENT = 4;
+		$rootScope.TAB_SALE = 8;
+		$rootScope.TAB_STATS = 16;
+		$rootScope.TAB_NONE = 0;
+		$rootScope.isPrimaryTabActive = function(e) {
+			console.log("is active " + e);
+			return $rootScope.actived_primary_tab & e;
+		};
+		$rootScope.setActivePrimaryTab = function(e) {
+			console.log("set active " + e);
+			$rootScope.actived_primary_tab = e;
+		};
+	})
+	.controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout) {
+		$scope.syncBtnTxt = '同步数据';
+		$scope.keyword = {
+			value : ''
+		};
+		$scope.loadPage = function(pageNum) {
+			console.log($scope.keyword);
+			if($scope.pager == undefined) {
+				$scope.pager = {
+					currentPage : 1
+				}
 			}
-		}
-		$http.post('/admin/products/' + pageNum, $scope.keyword).success(function(data, status, headers, config) {
-			$scope.pager = data;
-			$scope.products = data.results;
-			$scope.gridOptions.data = $scope.products;
+			$http.post('/admin/products/' + pageNum, $scope.keyword).success(function(data, status, headers, config) {
+				$scope.pager = data;
+				$scope.products = data.results;
+				$scope.gridOptions.data = $scope.products;
 
+				$scope.alerts = [];
+			}).error(function(data, status, headers, config) {
+				console.log('request failed...');
+			});
+		};
+
+		$scope.reloadCurrentPage = function() {
+			$scope.loadPage($scope.pager.currentPage);
+		};
+
+		$scope.loadPage(1);
+		$scope.gridOptions = {
+			rowHeight : 50,
+			appScope : $scope,
+			columnDefs : ColumnDefs.productGridDef
+		};
+		$scope.sync = function() {
 			$scope.alerts = [];
-		}).error(function(data, status, headers, config) {
-			console.log('request failed...');
-		});
-	};
+			$scope.syncBtnTxt = '进行中...';
+			$http.get('/admin/sync/').success(function(data, status, headers, config) {
+				console.log(data);
+				$scope.syncBtnTxt = '同步数据';
+				$scope.alerts.push({
+					type : 'success',
+					msg : '同步数据成功'
+				});
+				$timeout(function() {
+					$route.reload();
+				}, 1000);
 
-	$scope.reloadCurrentPage = function() {
-		$scope.loadPage($scope.pager.currentPage);
-	};
-
-	$scope.loadPage(1);
-	$scope.gridOptions = {
-		rowHeight : 50,
-		appScope : $scope,
-		columnDefs : ColumnDefs.productGridDef
-	};
-	$scope.sync = function() {
-		$scope.alerts = [];
-		$scope.syncBtnTxt = '进行中...';
-		$http.get('/admin/sync/').success(function(data, status, headers, config) {
-			console.log(data);
-			$scope.syncBtnTxt = '同步数据';
-			$scope.alerts.push({
-				type : 'success',
-				msg : '同步数据成功'
+			}).error(function(data, status, headers, config) {
+				console.log('request failed...');
+				$scope.alerts.push({
+					type : 'danger',
+					msg : '同步数据失败'
+				});
 			});
-			$timeout(function() {
-				$route.reload();
-			}, 1000);
-
-		}).error(function(data, status, headers, config) {
-			console.log('request failed...');
-			$scope.alerts.push({
-				type : 'danger',
-				msg : '同步数据失败'
+		};
+		$scope.closeAlert = function(index) {
+			$scope.alerts.splice(index, 1);
+		};
+		$scope.bot = function(pid) {
+			$scope.alerts = [];
+			$http.get('/admin/robotorder/' + pid).success(function(data, status, headers, config) {
+				$scope.alerts.push({
+					type : 'success',
+					msg : '机器打价成功'
+				});
+				$scope.reloadCurrentPage();
+			}).error(function(data, status, headers, config) {
+				console.log('request failed...');
+				$scope.alerts.push({
+					type : 'danger',
+					msg : '机器打价失败'
+				});
 			});
-		});
-	};
-	$scope.closeAlert = function(index) {
-		$scope.alerts.splice(index, 1);
-	};
-	$scope.bot = function(pid) {
-		$scope.alerts = [];
-		$http.get('/admin/robotorder/' + pid).success(function(data, status, headers, config) {
-			$scope.alerts.push({
-				type : 'success',
-				msg : '机器打价成功'
+		}
+		$scope.addProduct = function() {
+			window.location.href = '#/product/0';
+		}
+		$scope.editProduct = function(pid) {
+			window.location.href = '#/product/' + pid;
+		};
+		$scope.delProduct = function(pid) {
+			$http.get('/admin/product/remove/' + pid).success(function(data, status, headers, config) {
+				window.location = '#';
+			}).error(function(data, status, headers, config) {
+				console.log('request failed...');
 			});
-			$scope.reloadCurrentPage();
-		}).error(function(data, status, headers, config) {
-			console.log('request failed...');
-			$scope.alerts.push({
-				type : 'danger',
-				msg : '机器打价失败'
-			});
-		});
-	}
-	$scope.addProduct = function() {
-		window.location.href = '#/product/0';
-	}
-	$scope.editProduct = function(pid) {
-		window.location.href = '#/product/' + pid;
-	};
-	$scope.delProduct = function(pid) {
-		$http.get('/admin/product/remove/' + pid).success(function(data, status, headers, config) {
-			window.location = '#';
-		}).error(function(data, status, headers, config) {
-			console.log('request failed...');
-		});
-	};
+		};
 }).controller('OrdersCtrl', function($scope, $http) {
 	console.log('OrdersCtrl...');
 	$scope.orderFilter = {
