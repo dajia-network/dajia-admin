@@ -441,6 +441,9 @@ angular.module('dajiaAdmin.controllers', [])
 			}, {
 				code : 'huitongkuaidi',
 				name : '百世汇通'
+			}, {
+				code : 'yuantong',
+				name : '圆通快递'
 			} ];
 			$http.get('/admin/order/' + $routeParams.orderId).success(
 					function(data, status, headers, config) {
