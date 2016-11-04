@@ -1,124 +1,128 @@
-angular.module('dajiaAdmin.controllers', [])
-	.run(function($rootScope) {
-		$rootScope.actived_primary_tab = 1;
-		$rootScope.TAB_PRODUCT = 1;
-		$rootScope.TAB_ORDER = 2;
-		$rootScope.TAB_CLIENT = 4;
-		$rootScope.TAB_SALE = 8;
-		$rootScope.TAB_STATS = 16;
-		$rootScope.TAB_NONE = 0;
-		$rootScope.isPrimaryTabActive = function(e) {
-			// console.log("is active " + e);
-			return $rootScope.actived_primary_tab & e;
-		};
-		$rootScope.setActivePrimaryTab = function(e) {
-			console.log("set active " + e);
-			$rootScope.actived_primary_tab = e;
-		};
-		$rootScope.LAST_URL = "#";
-	})
-	.controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout, $routeParams) {
-		$scope.syncBtnTxt = '同步数据';
-		$scope.keyword = {
-			value : ''
-		};
+angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
+	$rootScope.actived_primary_tab = 1;
+	$rootScope.TAB_PRODUCT = 1;
+	$rootScope.TAB_ORDER = 2;
+	$rootScope.TAB_CLIENT = 4;
+	$rootScope.TAB_SALE = 8;
+	$rootScope.TAB_STATS = 16;
+	$rootScope.TAB_NONE = 0;
+	$rootScope.isPrimaryTabActive = function(e) {
+		// console.log("is active " + e);
+		return $rootScope.actived_primary_tab & e;
+	};
+	$rootScope.setActivePrimaryTab = function(e) {
+		console.log("set active " + e);
+		$rootScope.actived_primary_tab = e;
+	};
+	$rootScope.LAST_URL = "#";
+}).controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout, $routeParams) {
+	$scope.syncBtnTxt = '同步数据';
+	$scope.keyword = {
+		value : ''
+	};
 
-		/** init **/
-		if($scope.pager == undefined) {
-			var c = $routeParams.pageId;
-			if(!c || c <=0 ) {
-				c = 1;
-			}
-
-			$scope.pager = {
-				currentPage : c
-			}
-			console.log("current page inited to " + $scope.pager.currentPage);
+	/** init * */
+	if ($scope.pager == undefined) {
+		var c = $routeParams.pageId;
+		if (!c || c <= 0) {
+			c = 1;
 		}
 
-		$scope.loadPage = function(pageNum) {
-			console.log($scope.keyword);
-			$scope.alerts = [{type:"info", msg:"数据更新中 ..."}];
-			$http.post('/admin/products/' + pageNum, $scope.keyword).success(function(data, status, headers, config) {
-				$scope.pager = data;
-				$scope.products = data.results;
-				$scope.gridOptions.data = $scope.products;
-				$scope.alerts = [{type:'success', msg: '数据已更新 @' + new Date().Format("yyyy-MM-dd hh:mm:ss")}];
-				$rootScope.LAST_URL = "#/products/" + pageNum;
-
-				// $timeout(function() {
-				// 	$scope.alerts = [];
-				// }, 1000);
-			}).error(function(data, status, headers, config) {
-				console.log('request failed...');
-			});
-		};
-
-		$scope.reloadCurrentPage = function() {
-			$scope.loadPage($scope.pager.currentPage);
-			console.log("current page reloaded");
-		};
-
-		$scope.reloadCurrentPage();
-		$scope.gridOptions = {
-			rowHeight : 50,
-			appScope : $scope,
-			columnDefs : ColumnDefs.productGridDef
-		};
-		$scope.sync = function() {
-			$scope.alerts = [];
-			$scope.syncBtnTxt = '进行中...';
-			$http.get('/admin/sync/').success(function(data, status, headers, config) {
-				console.log(data);
-				$scope.syncBtnTxt = '同步数据';
-				$scope.alerts.push({
-					type : 'success',
-					msg : '同步数据成功'
-				});
-				$timeout(function() {
-					$route.reload();
-				}, 1000);
-
-			}).error(function(data, status, headers, config) {
-				console.log('request failed...');
-				$scope.alerts.push({
-					type : 'danger',
-					msg : '同步数据失败'
-				});
-			});
-		};
-		$scope.closeAlert = function(index) {
-			$scope.alerts.splice(index, 1);
-		};
-		$scope.bot = function(pid) {
-			$scope.alerts = [];
-			$http.get('/admin/robotorder/' + pid).success(function(data, status, headers, config) {
-				$scope.alerts.push({
-					type : 'success',
-					msg : '机器打价成功'
-				});
-				$scope.reloadCurrentPage();
-			}).error(function(data, status, headers, config) {
-				console.log('request failed...');
-				$scope.alerts.push({
-					type : 'danger',
-					msg : '机器打价失败'
-				});
-			});
+		$scope.pager = {
+			currentPage : c
 		}
-		$scope.addProduct = function() {
-			window.location.href = '#/product/0';
-		}
-		$scope.editProduct = function(pid) {
-			window.location.href = '#/product/' + pid;
-		};
-		$scope.delProduct = function(pid) {
-			$http.get('/admin/product/remove/' + pid).success(function(data, status, headers, config) {
-				window.location = '#';
-			}).error(function(data, status, headers, config) {
-				console.log('request failed...');
+		console.log("current page inited to " + $scope.pager.currentPage);
+	}
+
+	$scope.loadPage = function(pageNum) {
+		console.log($scope.keyword);
+		$scope.alerts = [ {
+			type : "info",
+			msg : "数据更新中 ..."
+		} ];
+		$http.post('/admin/products/' + pageNum, $scope.keyword).success(function(data, status, headers, config) {
+			$scope.pager = data;
+			$scope.products = data.results;
+			$scope.gridOptions.data = $scope.products;
+			$scope.alerts = [ {
+				type : 'success',
+				msg : '数据已更新 @' + new Date().Format("yyyy-MM-dd hh:mm:ss")
+			} ];
+			$rootScope.LAST_URL = "#/products/" + pageNum;
+
+			// $timeout(function() {
+			// $scope.alerts = [];
+			// }, 1000);
+		}).error(function(data, status, headers, config) {
+			console.log('request failed...');
+		});
+	};
+
+	$scope.reloadCurrentPage = function() {
+		$scope.loadPage($scope.pager.currentPage);
+		console.log("current page reloaded");
+	};
+
+	$scope.reloadCurrentPage();
+	$scope.gridOptions = {
+		rowHeight : 50,
+		appScope : $scope,
+		columnDefs : ColumnDefs.productGridDef
+	};
+	$scope.sync = function() {
+		$scope.alerts = [];
+		$scope.syncBtnTxt = '进行中...';
+		$http.get('/admin/sync/').success(function(data, status, headers, config) {
+			console.log(data);
+			$scope.syncBtnTxt = '同步数据';
+			$scope.alerts.push({
+				type : 'success',
+				msg : '同步数据成功'
 			});
-		};
+			$timeout(function() {
+				$route.reload();
+			}, 1000);
+
+		}).error(function(data, status, headers, config) {
+			console.log('request failed...');
+			$scope.alerts.push({
+				type : 'danger',
+				msg : '同步数据失败'
+			});
+		});
+	};
+	$scope.closeAlert = function(index) {
+		$scope.alerts.splice(index, 1);
+	};
+	$scope.bot = function(pid) {
+		$scope.alerts = [];
+		$http.get('/admin/robotorder/' + pid).success(function(data, status, headers, config) {
+			$scope.alerts.push({
+				type : 'success',
+				msg : '机器打价成功'
+			});
+			$scope.reloadCurrentPage();
+		}).error(function(data, status, headers, config) {
+			console.log('request failed...');
+			$scope.alerts.push({
+				type : 'danger',
+				msg : '机器打价失败'
+			});
+		});
+	}
+	$scope.addProduct = function() {
+		window.location.href = '#/product/0';
+	}
+	$scope.editProduct = function(pid) {
+		window.location.href = '#/product/' + pid;
+	};
+	$scope.delProduct = function(pid) {
+		$http.get('/admin/product/remove/' + pid).success(function(data, status, headers, config) {
+			window.location = '#';
+		}).error(function(data, status, headers, config) {
+			console.log('request failed...');
+		});
+	};
 }).controller('OrdersCtrl', function($scope, $http) {
 	console.log('OrdersCtrl...');
 	$scope.orderFilter = {
@@ -308,6 +312,8 @@ angular.module('dajiaAdmin.controllers', [])
 			$scope.submit = function() {
 				$scope.alerts = [];
 				console.log($scope.product);
+				$scope.product.postFee += '';
+				$scope.product.stock += '';
 				if (!$scope.product.name || !$scope.product.postFee || !$scope.product.stock
 						|| !$scope.product.originalPrice || !$scope.product.startDate || !$scope.product.expiredDate
 						|| !$scope.product.prices || $scope.product.prices.length == 0) {
@@ -680,25 +686,30 @@ angular.module('dajiaAdmin.controllers', [])
 	}
 })
 
-.controller ('PreferenceCtrl',  function($scope, $rootScope, $http) {
-	var ss = $scope;
-	ss.checkPass = function() {
-		ss.isNewPasswordError = ss.newPassword == undefined || ss.newPassword == null || ss.newPassword.trim() == "";
-		ss.checkConfirmNewPassword();
-	};
+.controller(
+		'PreferenceCtrl',
+		function($scope, $rootScope, $http) {
+			var ss = $scope;
+			ss.checkPass = function() {
+				ss.isNewPasswordError = ss.newPassword == undefined || ss.newPassword == null
+						|| ss.newPassword.trim() == "";
+				ss.checkConfirmNewPassword();
+			};
 
-	ss.checkConfirmNewPassword = function() {
-		ss.isConfirmNewPasswordMissing = ss.confirmNewPassword == undefined || ss.confirmNewPassword == null || ss.confirmNewPassword.trim() == "";
-		ss.isConfirmNewPasswordNotMatch = !ss.isConfirmNewPasswordMissing && ss.confirmNewPassword !== ss.newPassword;
-		ss.isConfirmNewPasswordError = ss.isConfirmNewPasswordMissing || ss.isConfirmNewPasswordNotMatch;
-	}
+			ss.checkConfirmNewPassword = function() {
+				ss.isConfirmNewPasswordMissing = ss.confirmNewPassword == undefined || ss.confirmNewPassword == null
+						|| ss.confirmNewPassword.trim() == "";
+				ss.isConfirmNewPasswordNotMatch = !ss.isConfirmNewPasswordMissing
+						&& ss.confirmNewPassword !== ss.newPassword;
+				ss.isConfirmNewPasswordError = ss.isConfirmNewPasswordMissing || ss.isConfirmNewPasswordNotMatch;
+			}
 
-	$scope.checkCurrentPassword = function() {
-		var a = ss.currentPassword;
-		ss.isCurrentPasswordMissing = a == undefined || a == null || a.trim() == "";
-		ss.isCurrentPasswordError = ss.isCurrentPasswordMissing;
-	}
-})
+			$scope.checkCurrentPassword = function() {
+				var a = ss.currentPassword;
+				ss.isCurrentPasswordMissing = a == undefined || a == null || a.trim() == "";
+				ss.isCurrentPasswordError = ss.isCurrentPasswordMissing;
+			}
+		})
 
 ;
 
