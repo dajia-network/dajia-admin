@@ -121,7 +121,8 @@ ColumnDefs = {
 			{
 				name : '用户',
 				field : 'userName',
-				width : 80
+				width : 80,
+				cellTemplate : "<div class='ui-grid-cell-contents'><a ng-href='#/client/{{row.entity.userId}}'>{{row.entity.userName}}</a></div>"
 			},
 			{
 				name : '订单状态',
