@@ -144,7 +144,7 @@
 				<button class="btn btn-primary" ng-click="addComments(order.orderId)">添加备注</button>
 				<button class="btn btn-primary" ng-disabled="order.orderStatus==5" ng-click="closeOrder(order.orderId)">关闭订单</button>
 				<button class="btn btn-primary" ng-disabled="order.orderStatus!=5" ng-click="reopenOrder(order.orderId)">恢复订单</button>
-				<a class="btn btn-default" href="#/orders" role="button">返回</a>
+				<a class="btn btn-default" href="javascript:history.back()" role="button">返回</a>
 			</div>
 		</div>
 	</form>

@@ -123,23 +123,45 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 			console.log('request failed...');
 		});
 	};
-}).controller('OrdersCtrl', function($scope, $http) {
+}).controller('OrdersCtrl', function($scope, $http, $routeParams, $rootScope) {
 	console.log('OrdersCtrl...');
 	$scope.orderFilter = {
 		type : 'real',
 		status : -1
 	};
+
+	/** init * */
+	if ($scope.pager == undefined) {
+		var c = $routeParams.pageId;
+		if (!c || c <= 0) {
+			c = 1;
+		}
+
+		$scope.pager = {
+			currentPage : c
+		}
+		console.log("current page inited to " + $scope.pager.currentPage);
+	}
+	
 	$scope.loadPage = function(pageNum) {
 		$http.post('/admin/orders/' + pageNum, $scope.orderFilter).success(function(data, status, headers, config) {
 			// console.log(data);
 			$scope.pager = data;
 			$scope.orders = data.results;
 			$scope.gridOptions.data = $scope.orders;
+			$rootScope.LAST_URL = "#/orders/" + pageNum;
 		}).error(function(data, status, headers, config) {
 			console.log('request failed...');
 		});
 	}
-	$scope.loadPage(1);
+	
+	$scope.reloadCurrentPage = function() {
+		$scope.loadPage($scope.pager.currentPage);
+		console.log("current page reloaded");
+	};
+
+	$scope.reloadCurrentPage();
+	
 	$scope.gridOptions = {
 		rowHeight : 50,
 		appScope : $scope,

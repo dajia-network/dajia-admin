@@ -63,6 +63,11 @@ angular.module(
 			templateUrl:'./templates/products.html',
 			controller:'ProductsCtrl'
 		})
+		.when("/orders/:pageId", {
+			cache: false,
+			templateUrl:'./templates/orders.html',
+			controller:'OrdersCtrl'
+		})
 		.otherwise('/products')
 } ]).service('authInterceptor', function($q) {
 	var service = this;
