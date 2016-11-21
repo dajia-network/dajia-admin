@@ -15,11 +15,16 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 		$rootScope.actived_primary_tab = e;
 	};
 	$rootScope.LAST_URL = "#";
-}).controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout, $routeParams) {
-	$scope.syncBtnTxt = '同步数据';
-	$scope.keyword = {
+	$rootScope.productKeyword = {
 		value : ''
 	};
+	$rootScope.orderFilter = {
+		type : 'real',
+		status : -1
+	};
+}).controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout, $routeParams) {
+	$scope.syncBtnTxt = '同步数据';
+	$scope.keyword = $rootScope.productKeyword;
 
 	/** init * */
 	if ($scope.pager == undefined) {
@@ -32,6 +37,15 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 			currentPage : c
 		}
 		console.log("current page inited to " + $scope.pager.currentPage);
+	}
+
+	$scope.search = function() {
+		$rootScope.productKeyword = $scope.keyword;
+		if (null == $routeParams.pageId) {
+			$scope.loadPage(1);
+		} else {
+			window.location.href = '#/products';
+		}
 	}
 
 	$scope.loadPage = function(pageNum) {
@@ -125,10 +139,7 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 	};
 }).controller('OrdersCtrl', function($scope, $http, $routeParams, $rootScope) {
 	console.log('OrdersCtrl...');
-	$scope.orderFilter = {
-		type : 'real',
-		status : -1
-	};
+	$scope.orderFilter = $rootScope.orderFilter;
 
 	/** init * */
 	if ($scope.pager == undefined) {
@@ -142,7 +153,16 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 		}
 		console.log("current page inited to " + $scope.pager.currentPage);
 	}
-	
+
+	$scope.search = function() {
+		$rootScope.orderFilter = $scope.orderFilter;
+		if (null == $routeParams.pageId) {
+			$scope.loadPage(1);
+		} else {
+			window.location.href = '#/orders';
+		}
+	}
+
 	$scope.loadPage = function(pageNum) {
 		$http.post('/admin/orders/' + pageNum, $scope.orderFilter).success(function(data, status, headers, config) {
 			// console.log(data);
@@ -154,14 +174,14 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 			console.log('request failed...');
 		});
 	}
-	
+
 	$scope.reloadCurrentPage = function() {
 		$scope.loadPage($scope.pager.currentPage);
 		console.log("current page reloaded");
 	};
 
 	$scope.reloadCurrentPage();
-	
+
 	$scope.gridOptions = {
 		rowHeight : 50,
 		appScope : $scope,

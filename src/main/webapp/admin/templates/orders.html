@@ -3,17 +3,17 @@
 	<div class="row">
 		<div class="col-sm-3">
 			<div class="btn-group">
-		        <label class="btn btn-default" ng-model="orderFilter.type" uib-btn-radio="'all'" ng-click="loadPage(1)">全部订单</label>
-		        <label class="btn btn-default" ng-model="orderFilter.type" uib-btn-radio="'real'" ng-click="loadPage(1)">排除机器订单</label>
+		        <label class="btn btn-default" ng-model="orderFilter.type" uib-btn-radio="'all'" ng-click="search()">全部订单</label>
+		        <label class="btn btn-default" ng-model="orderFilter.type" uib-btn-radio="'real'" ng-click="search()">排除机器订单</label>
 		    </div>
 		</div>
 		<div class="col-sm-4">
 			<div class="btn-group">
-		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="-1" ng-click="loadPage(1)">全部订单</label>
-		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="2" ng-click="loadPage(1)">待发货</label>
-		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="3" ng-click="loadPage(1)">已发货</label>
-		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="4" ng-click="loadPage(1)">已签收</label>
-		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="5" ng-click="loadPage(1)">已关闭</label>
+		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="-1" ng-click="search()">全部订单</label>
+		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="2" ng-click="search()">待发货</label>
+		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="3" ng-click="search()">已发货</label>
+		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="4" ng-click="search()">已签收</label>
+		        <label class="btn btn-default" ng-model="orderFilter.status" uib-btn-radio="5" ng-click="search()">已关闭</label>
 		    </div>
 		</div>
 	</div>
@@ -21,9 +21,9 @@
     <p></p>
 	<div class="input-group">
 	    <span class="input-group-btn">
-	      <button class="btn btn-default" type="button" ng-click="loadPage(1);">搜索</button>
+	      <button class="btn btn-default" type="button" ng-click="search()">搜索</button>
 	    </span>
-	    <input type="text" my-enter="loadPage(1);" class="form-control" ng-model="orderFilter.trackingId" placeholder="输入订单编号">
+	    <input type="text" my-enter="search()" class="form-control" ng-model="orderFilter.trackingId" placeholder="输入订单编号">
     </div>
     <p></p>
     

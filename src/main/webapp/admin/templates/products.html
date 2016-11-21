@@ -9,9 +9,9 @@
     <p></p>
 	<div class="input-group">
 	    <span class="input-group-btn">
-	      <button class="btn btn-default" type="button" ng-click="loadPage(1);">搜索</button>
+	      <button class="btn btn-default" type="button" ng-click="search()">搜索</button>
 	    </span>
-	    <input type="text" my-enter="loadPage(1);" class="form-control" ng-model="keyword.value" placeholder="输入产品名">
+	    <input type="text" my-enter="search();" class="form-control" ng-model="keyword.value" placeholder="输入产品名">
     </div>
 	<p></p>
 	<div class="gridStyle" ui-grid="gridOptions"></div>
