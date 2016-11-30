@@ -492,6 +492,9 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 			}, {
 				code : 'yuantong',
 				name : '圆通快递'
+			}, {
+				code : 'ems',
+				name : '邮政EMS'
 			} ];
 			$http.get('/admin/order/' + $routeParams.orderId).success(
 					function(data, status, headers, config) {
