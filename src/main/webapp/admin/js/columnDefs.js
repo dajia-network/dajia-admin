@@ -20,6 +20,12 @@ ColumnDefs = {
 				cellTemplate : '<div class="ui-grid-cell-contents"><a href ng-click="grid.appScope.editProduct(row.entity.product.productId);">{{row.entity.product.name}}</a></div>'
 			},
 			{
+				name : '标签',
+				field : 'product.tags',
+				width : 100,
+				cellTemplate : '<div class="ui-grid-cell-contents"><span ng-repeat="tag in row.entity.product.tags">{{tag.tagName}}&nbsp;</span></div>'
+			},
+			{
 				name : '当前价格',
 				field : 'currentPrice',
 				enableSorting : false,

@@ -2,7 +2,6 @@ package com.dajia.admin.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,22 +10,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.sf.ehcache.Cache;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.dajia.domain.Price;
 import com.dajia.domain.Product;
 import com.dajia.domain.ProductItem;
+import com.dajia.domain.ProductTag;
 import com.dajia.domain.User;
 import com.dajia.domain.UserOrder;
 import com.dajia.repository.ProductItemRepo;
 import com.dajia.repository.ProductRepo;
+import com.dajia.repository.ProductTagRepo;
 import com.dajia.repository.UserOrderRepo;
 import com.dajia.repository.UserRepo;
 import com.dajia.service.OrderService;
@@ -43,7 +48,6 @@ import com.dajia.vo.OrderFilterVO;
 import com.dajia.vo.OrderVO;
 import com.dajia.vo.PaginationVO;
 import com.dajia.vo.ProductVO;
-import com.dajia.vo.ReturnVO;
 import com.dajia.vo.SalesVO;
 
 @RestController
@@ -76,6 +80,9 @@ public class AdminController {
 
 	@Autowired
 	private SmsService smsService;
+
+	@Autowired
+	private ProductTagRepo tagRepo;
 
 	@Autowired
 	EhCacheCacheManager ehcacheManager;
@@ -355,9 +362,10 @@ public class AdminController {
 		return statService.getRewardStatsByPage(pageNum);
 	}
 
-
-	@RequestMapping(value = "/admin/preference/changePassword", method= RequestMethod.POST)
-	public void changeAdminPassword(@RequestParam(value="currentPassword", required = false) String currentPassword, @RequestParam(value="newPassword", required=false) String newPassword, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	@RequestMapping(value = "/admin/preference/changePassword", method = RequestMethod.POST)
+	public void changeAdminPassword(@RequestParam(value = "currentPassword", required = false) String currentPassword,
+			@RequestParam(value = "newPassword", required = false) String newPassword, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 
 		logger.info("admin change password, currentPass is {}, newPass is {}", currentPassword, newPassword);
 		LoginUserVO loginUserVO = (LoginUserVO) request.getSession(true).getAttribute(UserUtils.session_user);
@@ -369,7 +377,7 @@ public class AdminController {
 		Long userId = loginUserVO.userId;
 		boolean result = userService.updateUserPassword(userId, currentPassword, newPassword);
 
-		if(result) {
+		if (result) {
 			response.sendRedirect("/admin/index.html#/preference/changePasswordSuccess");
 		} else {
 			response.sendRedirect("/admin/index.html#/preference/changePasswordFail");
@@ -394,42 +402,56 @@ public class AdminController {
 		}
 		return user;
 	}
-//
-//	@RequestMapping(value = "/smslogin", method = RequestMethod.POST)
-//	public @ResponseBody LoginUserVO userSmsLogin(@RequestBody LoginUserVO loginUser, HttpServletRequest request,
-//			HttpServletResponse response) {
-//		if (null != ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code)) {
-//			Cache cache = ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code);
-//			String signinCode = cache.get(loginUser.mobile).getObjectValue().toString();
-//			logger.info(signinCode);
-//			if (null == signinCode || !signinCode.equals(loginUser.signinCode)) {
-//				return null;
-//			}
-//			loginUser.loginIP = CommonUtils.getRequestIP(request);
-//			loginUser.loginDate = new Date();
-//
-//			User user = userService.userLogin(loginUser.mobile, loginUser.password, request, true);
-//			loginUser = UserUtils.addLoginSession(loginUser, user, request);
-//
-//			return loginUser;
-//		} else {
-//			return null;
-//		}
-//	}
-//
-//	@RequestMapping("/signupCheck/{mobile}")
-//	public @ResponseBody ReturnVO signupCheck(@PathVariable("mobile") String mobile) {
-//		String result = userService.checkMobile(mobile);
-//		ReturnVO rv = new ReturnVO();
-//		rv.result = result;
-//		return rv;
-//	}
-//
-//	@RequestMapping("/signinSms/{mobile}")
-//	public @ResponseBody ReturnVO signinSms(@PathVariable("mobile") String mobile) {
-//		String result = smsService.sendSigninMessage(mobile, true);
-//		ReturnVO rv = new ReturnVO();
-//		rv.result = result;
-//		return rv;
-//	}
+
+	@RequestMapping("/admin/tags")
+	public List<ProductTag> productTags() {
+		return tagRepo.findByIsActive(CommonUtils.Y);
+	}
+	
+	//
+	// @RequestMapping(value = "/smslogin", method = RequestMethod.POST)
+	// public @ResponseBody LoginUserVO userSmsLogin(@RequestBody LoginUserVO
+	// loginUser, HttpServletRequest request,
+	// HttpServletResponse response) {
+	// if (null !=
+	// ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code))
+	// {
+	// Cache cache =
+	// ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code);
+	// String signinCode =
+	// cache.get(loginUser.mobile).getObjectValue().toString();
+	// logger.info(signinCode);
+	// if (null == signinCode || !signinCode.equals(loginUser.signinCode)) {
+	// return null;
+	// }
+	// loginUser.loginIP = CommonUtils.getRequestIP(request);
+	// loginUser.loginDate = new Date();
+	//
+	// User user = userService.userLogin(loginUser.mobile, loginUser.password,
+	// request, true);
+	// loginUser = UserUtils.addLoginSession(loginUser, user, request);
+	//
+	// return loginUser;
+	// } else {
+	// return null;
+	// }
+	// }
+	//
+	// @RequestMapping("/signupCheck/{mobile}")
+	// public @ResponseBody ReturnVO signupCheck(@PathVariable("mobile") String
+	// mobile) {
+	// String result = userService.checkMobile(mobile);
+	// ReturnVO rv = new ReturnVO();
+	// rv.result = result;
+	// return rv;
+	// }
+	//
+	// @RequestMapping("/signinSms/{mobile}")
+	// public @ResponseBody ReturnVO signinSms(@PathVariable("mobile") String
+	// mobile) {
+	// String result = smsService.sendSigninMessage(mobile, true);
+	// ReturnVO rv = new ReturnVO();
+	// rv.result = result;
+	// return rv;
+	// }
 }

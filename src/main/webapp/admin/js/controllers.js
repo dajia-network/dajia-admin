@@ -269,6 +269,13 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 		function($scope, $rootScope, $http, $routeParams, $route, $window) {
 			console.log('ProductDetailCtrl...');
 			$scope.descImages = [];
+			$scope.tags = [];
+			$scope.checkedTags = [];
+			$http.get('/admin/tags').success(function(data, status, headers, config) {
+				$scope.tags = data;
+			}).error(function(data, status, headers, config) {
+				console.log('request failed...');
+			});
 			$http.get('/admin/product/' + $routeParams.pid).success(function(data, status, headers, config) {
 				// console.log(data);
 				$scope.newSold = null;
@@ -291,6 +298,7 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 				if (null == product.fixTop) {
 					product.fixTop = 0;
 				}
+				$scope.checkedTags = product.tags;
 				$scope.product = product;
 			}).error(function(data, status, headers, config) {
 				console.log('request failed...');
@@ -351,8 +359,27 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 							$window.location.reload();
 						});
 			}
+			$scope.checkTag = function(tag) {
+				if ($scope.getTagIdx(tag) == -1) {
+					$scope.checkedTags.push(tag);
+				} else {
+					$scope.checkedTags.splice($scope.getTagIdx(tag), 1);
+				}
+				console.log($scope.checkedTags);
+			};
+			$scope.getTagIdx = function(tag) {
+				if (null != $scope.checkedTags) {
+					for (i = 0; i < $scope.checkedTags.length; i++) {
+						if ($scope.checkedTags[i].tagId == tag.tagId) {
+							return i;
+						}
+					}
+				}
+				return -1;
+			}
 			$scope.submit = function() {
 				$scope.alerts = [];
+				$scope.product.tags = $scope.checkedTags;
 				console.log($scope.product);
 				$scope.product.postFee += '';
 				$scope.product.stock += '';
