@@ -155,6 +155,26 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 	}
 
 	$scope.search = function() {
+		$scope.orderFilter.trackingId = $scope.orderFilter.searchId;
+		$scope.orderFilter.productId = null;
+		search();
+	}
+
+	$scope.searchByProductId = function() {
+		$scope.orderFilter.productId = $scope.orderFilter.searchId;
+		$scope.orderFilter.trackingId = null;
+		search();
+	}
+
+	$scope.searchReset = function() {
+		$scope.orderFilter = {
+			type : 'real',
+			status : -1
+		};
+		search();
+	}
+
+	var search = function() {
 		$rootScope.orderFilter = $scope.orderFilter;
 		if (null == $routeParams.pageId) {
 			$scope.loadPage(1);

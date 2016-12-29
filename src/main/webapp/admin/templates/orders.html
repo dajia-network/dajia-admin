@@ -21,9 +21,18 @@
     <p></p>
 	<div class="input-group">
 	    <span class="input-group-btn">
-	      <button class="btn btn-default" type="button" ng-click="search()">搜索</button>
+			<div class="btn-group" uib-dropdown is-open="status.isopen">
+			  <button id="single-button" type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled">
+			    搜索<span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+			    <li role="menuitem"><a href ng-click="search()">搜索订单编号</a></li>
+			    <li role="menuitem"><a href ng-click="searchByProductId()">搜索产品ID</a></li>
+			    <li role="menuitem"><a href ng-click="searchReset()">清空搜索条件</a></li>
+			  </ul>
+			</div>
 	    </span>
-	    <input type="text" my-enter="search()" class="form-control" ng-model="orderFilter.trackingId" placeholder="输入订单编号">
+	    <input type="text" my-enter="search()" class="form-control" ng-model="orderFilter.searchId" placeholder="输入订单编号或产品ID">
     </div>
     <p></p>
     
