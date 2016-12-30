@@ -34,12 +34,14 @@ import com.dajia.repository.ProductRepo;
 import com.dajia.repository.ProductTagRepo;
 import com.dajia.repository.UserOrderRepo;
 import com.dajia.repository.UserRepo;
+import com.dajia.service.ApiService;
 import com.dajia.service.OrderService;
 import com.dajia.service.ProductService;
 import com.dajia.service.RefundService;
 import com.dajia.service.SmsService;
 import com.dajia.service.StatService;
 import com.dajia.service.UserService;
+import com.dajia.util.ApiWechatUtils;
 import com.dajia.util.CommonUtils;
 import com.dajia.util.CommonUtils.OrderStatus;
 import com.dajia.util.UserUtils;
@@ -49,6 +51,8 @@ import com.dajia.vo.OrderVO;
 import com.dajia.vo.PaginationVO;
 import com.dajia.vo.ProductVO;
 import com.dajia.vo.SalesVO;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 @RestController
 public class AdminController {
@@ -83,6 +87,12 @@ public class AdminController {
 
 	@Autowired
 	private ProductTagRepo tagRepo;
+
+	@Autowired
+	private ApiService apiService;
+
+	@Autowired
+	private UserRepo userRepo;
 
 	@Autowired
 	EhCacheCacheManager ehcacheManager;
@@ -307,7 +317,7 @@ public class AdminController {
 	}
 
 	@RequestMapping("/admin/order/{orderId}/deliver")
-	public UserOrder deliverOrder(@PathVariable("orderId") Long orderId, HttpServletRequest request) {
+	public UserOrder deliverOrder(@PathVariable("orderId") Long orderId, HttpServletRequest request) throws IOException {
 		String logisticTrackingId = request.getParameter("lti");
 		String logisticAgent = request.getParameter("la");
 		UserOrder order = orderRepo.findOne(orderId);
@@ -315,6 +325,13 @@ public class AdminController {
 		order.logisticAgent = logisticAgent;
 		order.logisticTrackingId = logisticTrackingId;
 		orderRepo.save(order);
+
+		// 微信公众号发送购买成功通知
+		User user = userRepo.findByUserId(order.userId);
+		if (null != user) {
+			apiService.sendWechatTemplateMsg(ApiWechatUtils.wechat_msg_template_order_delivering, user.oauthUserId,
+					order.trackingId);
+		}
 		return order;
 	}
 
@@ -407,7 +424,7 @@ public class AdminController {
 	public List<ProductTag> productTags() {
 		return tagRepo.findByIsActive(CommonUtils.Y);
 	}
-	
+
 	//
 	// @RequestMapping(value = "/smslogin", method = RequestMethod.POST)
 	// public @ResponseBody LoginUserVO userSmsLogin(@RequestBody LoginUserVO
