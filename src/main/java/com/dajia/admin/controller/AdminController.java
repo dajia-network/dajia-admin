@@ -45,14 +45,13 @@ import com.dajia.util.ApiWechatUtils;
 import com.dajia.util.CommonUtils;
 import com.dajia.util.CommonUtils.OrderStatus;
 import com.dajia.util.UserUtils;
+import com.dajia.vo.BulkEditVO;
 import com.dajia.vo.LoginUserVO;
 import com.dajia.vo.OrderFilterVO;
 import com.dajia.vo.OrderVO;
 import com.dajia.vo.PaginationVO;
 import com.dajia.vo.ProductVO;
 import com.dajia.vo.SalesVO;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 @RestController
 public class AdminController {
@@ -189,7 +188,7 @@ public class AdminController {
 			productRepo.save(product);
 			return productService.convertProductVO(product, null);
 		} else {
-			logger.error("modify product failed, pid != productVo.productId");
+			logger.error("modify product failed, pid != productVO.productId");
 			return null;
 		}
 	}
@@ -425,50 +424,47 @@ public class AdminController {
 		return tagRepo.findByIsActive(CommonUtils.Y);
 	}
 
-	//
-	// @RequestMapping(value = "/smslogin", method = RequestMethod.POST)
-	// public @ResponseBody LoginUserVO userSmsLogin(@RequestBody LoginUserVO
-	// loginUser, HttpServletRequest request,
-	// HttpServletResponse response) {
-	// if (null !=
-	// ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code))
-	// {
-	// Cache cache =
-	// ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code);
-	// String signinCode =
-	// cache.get(loginUser.mobile).getObjectValue().toString();
-	// logger.info(signinCode);
-	// if (null == signinCode || !signinCode.equals(loginUser.signinCode)) {
-	// return null;
-	// }
-	// loginUser.loginIP = CommonUtils.getRequestIP(request);
-	// loginUser.loginDate = new Date();
-	//
-	// User user = userService.userLogin(loginUser.mobile, loginUser.password,
-	// request, true);
-	// loginUser = UserUtils.addLoginSession(loginUser, user, request);
-	//
-	// return loginUser;
-	// } else {
-	// return null;
-	// }
-	// }
-	//
-	// @RequestMapping("/signupCheck/{mobile}")
-	// public @ResponseBody ReturnVO signupCheck(@PathVariable("mobile") String
-	// mobile) {
-	// String result = userService.checkMobile(mobile);
-	// ReturnVO rv = new ReturnVO();
-	// rv.result = result;
-	// return rv;
-	// }
-	//
-	// @RequestMapping("/signinSms/{mobile}")
-	// public @ResponseBody ReturnVO signinSms(@PathVariable("mobile") String
-	// mobile) {
-	// String result = smsService.sendSigninMessage(mobile, true);
-	// ReturnVO rv = new ReturnVO();
-	// rv.result = result;
-	// return rv;
-	// }
+	@RequestMapping("/admin/bulkEdit/product")
+	public @ResponseBody Map<String, String> bulkEditProduct(@RequestBody BulkEditVO<ProductVO> bulkEdit)
+			throws IOException {
+		List<Long> productIds = bulkEdit.idList;
+		ProductVO productDetail = bulkEdit.entity;
+		productService.bulkUpdateProduct(productIds, productDetail);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("result", "success");
+		return map;
+	}
+
+	/*
+	 * @RequestMapping(value = "/smslogin", method = RequestMethod.POST) public
+	 * 
+	 * @ResponseBody LoginUserVO userSmsLogin(@RequestBody LoginUserVO
+	 * loginUser, HttpServletRequest request, HttpServletResponse response) { if
+	 * (null !=
+	 * ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code
+	 * )) { Cache cache =
+	 * ehcacheManager.getCacheManager().getCache(CommonUtils.cache_name_signin_code
+	 * ); String signinCode =
+	 * cache.get(loginUser.mobile).getObjectValue().toString();
+	 * logger.info(signinCode); if (null == signinCode ||
+	 * !signinCode.equals(loginUser.signinCode)) { return null; }
+	 * loginUser.loginIP = CommonUtils.getRequestIP(request);
+	 * loginUser.loginDate = new Date();
+	 * 
+	 * User user = userService.userLogin(loginUser.mobile, loginUser.password,
+	 * request, true); loginUser = UserUtils.addLoginSession(loginUser, user,
+	 * request);
+	 * 
+	 * return loginUser; } else { return null; } }
+	 * 
+	 * @RequestMapping("/signupCheck/{mobile}") public @ResponseBody ReturnVO
+	 * signupCheck(@PathVariable("mobile") String mobile) { String result =
+	 * userService.checkMobile(mobile); ReturnVO rv = new ReturnVO(); rv.result
+	 * = result; return rv; }
+	 * 
+	 * @RequestMapping("/signinSms/{mobile}") public @ResponseBody ReturnVO
+	 * signinSms(@PathVariable("mobile") String mobile) { String result =
+	 * smsService.sendSigninMessage(mobile, true); ReturnVO rv = new ReturnVO();
+	 * rv.result = result; return rv; }
+	 */
 }

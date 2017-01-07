@@ -22,9 +22,10 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 		type : 'real',
 		status : -1
 	};
-}).controller('ProductsCtrl', function($scope, $rootScope, $http, $route, $timeout, $routeParams) {
+}).controller('ProductsCtrl', function($uibModal, $scope, $rootScope, $http, $route, $timeout, $routeParams) {
 	$scope.syncBtnTxt = '同步数据';
 	$scope.keyword = $rootScope.productKeyword;
+	$scope.checkedProducts = [];
 
 	/** init * */
 	if ($scope.pager == undefined) {
@@ -83,28 +84,7 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 		appScope : $scope,
 		columnDefs : ColumnDefs.productGridDef
 	};
-	$scope.sync = function() {
-		$scope.alerts = [];
-		$scope.syncBtnTxt = '进行中...';
-		$http.get('/admin/sync/').success(function(data, status, headers, config) {
-			console.log(data);
-			$scope.syncBtnTxt = '同步数据';
-			$scope.alerts.push({
-				type : 'success',
-				msg : '同步数据成功'
-			});
-			$timeout(function() {
-				$route.reload();
-			}, 1000);
 
-		}).error(function(data, status, headers, config) {
-			console.log('request failed...');
-			$scope.alerts.push({
-				type : 'danger',
-				msg : '同步数据失败'
-			});
-		});
-	};
 	$scope.closeAlert = function(index) {
 		$scope.alerts.splice(index, 1);
 	};
@@ -137,7 +117,120 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 			console.log('request failed...');
 		});
 	};
-}).controller('OrdersCtrl', function($scope, $http, $routeParams, $rootScope) {
+
+	// bulk update
+
+	$scope.bulkEdit = function() {
+		if (null != $scope.checkedProducts && $scope.checkedProducts.length > 0) {
+			$scope.alerts = [];
+			console.log($scope.checkedProducts);
+			openModal();
+		} else {
+			$scope.alerts = [ {
+				type : "danger",
+				msg : "未选中任何产品"
+			} ];
+		}
+	}
+
+	$scope.checkProduct = function(productId) {
+		if (getProductIdx(productId) == -1) {
+			$scope.checkedProducts.push(productId);
+		} else {
+			$scope.checkedProducts.splice(getProductIdx(productId), 1);
+		}
+	}
+
+	var getProductIdx = function(productId) {
+		if (null != $scope.checkedProducts) {
+			for (i = 0; i < $scope.checkedProducts.length; i++) {
+				if ($scope.checkedProducts[i] == productId) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	var openModal = function() {
+		var modalInstance = $uibModal.open({
+			animation : true,
+			ariaLabelledBy : 'modal-title',
+			ariaDescribedBy : 'modal-body',
+			templateUrl : 'templates/bulkEditProduct.html',
+			controller : 'BulkEditModalCtrl',
+			controllerAs : '$ctrl',
+			resolve : {
+				checkedProducts : function() {
+					return $scope.checkedProducts;
+				}
+			}
+		});
+
+		modalInstance.result.then(function(productDetail) {
+			console.log(productDetail);
+			var bulkEdit = {
+				idList : $scope.checkedProducts,
+				entity : productDetail
+			};
+			$http.post('/admin/bulkEdit/product', bulkEdit).success(function(data, status, headers, config) {
+				$scope.alerts.push({
+					type : 'success',
+					msg : '批量编辑成功'
+				});
+				$scope.reloadCurrentPage();
+			}).error(function(data, status, headers, config) {
+				console.log('request failed...');
+			});
+		}, function() {
+			console.log('Modal dismissed at: ' + new Date());
+		});
+
+	};
+})
+
+.controller('BulkEditModalCtrl', function($uibModalInstance, $http, checkedProducts) {
+	var $ctrl = this;
+	$ctrl.checkedProducts = checkedProducts;
+	$ctrl.product = {};
+
+	$ctrl.ok = function() {
+		$ctrl.product.tags = $ctrl.checkedTags;
+		$uibModalInstance.close($ctrl.product);
+	};
+
+	$ctrl.cancel = function() {
+		$uibModalInstance.dismiss('cancel');
+	};
+
+	$ctrl.tags = [];
+	$ctrl.checkedTags = [];
+	$http.get('/admin/tags').success(function(data, status, headers, config) {
+		$ctrl.tags = data;
+	}).error(function(data, status, headers, config) {
+		console.log('request failed...');
+	});
+	$ctrl.checkTag = function(tag) {
+		if ($ctrl.getTagIdx(tag) == -1) {
+			$ctrl.checkedTags.push(tag);
+		} else {
+			$ctrl.checkedTags.splice($ctrl.getTagIdx(tag), 1);
+		}
+		console.log($ctrl.checkedTags);
+	};
+	$ctrl.getTagIdx = function(tag) {
+		if (null != $ctrl.checkedTags) {
+			for (i = 0; i < $ctrl.checkedTags.length; i++) {
+				if ($ctrl.checkedTags[i].tagId == tag.tagId) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+})
+
+.controller('OrdersCtrl', function($scope, $http, $routeParams, $rootScope) {
 	console.log('OrdersCtrl...');
 	$scope.orderFilter = $rootScope.orderFilter;
 

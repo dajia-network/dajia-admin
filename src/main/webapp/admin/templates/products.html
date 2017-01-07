@@ -2,7 +2,7 @@
 <div class="container">
 	<div class="ol-sm-12" ng-if="syncBtnTxt">
 		<button type="button" class="btn btn-primary" ng-click="addProduct();">新增产品</button>
-		<button type="button" class="btn btn-primary" ng-click="bulkEdit();">批量编辑</button>
+		<button type="button" class="btn btn-primary" ng-click="bulkEdit();">批量修改</button>
 		&nbsp;&nbsp;&nbsp;
 		<span style="line-height:1em;padding:8px;" ng-class="['alert', 'alert-'+alert.type]" ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</span>
 	</div>

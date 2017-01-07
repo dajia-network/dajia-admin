@@ -3,6 +3,11 @@ var ColumnDefs = ColumnDefs || {};
 ColumnDefs = {
 	productGridDef : [
 			{
+				name : ' ',
+				enableSorting : false,
+				cellTemplate : '<input type="checkbox" ng-click="grid.appScope.checkProduct(row.entity.product.productId)">'
+			},
+			{
 				name : '操作',
 				width : 130,
 				enableSorting : false,
