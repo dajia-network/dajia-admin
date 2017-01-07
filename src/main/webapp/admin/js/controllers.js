@@ -195,7 +195,7 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 	$ctrl.product = {};
 
 	$ctrl.ok = function() {
-		$ctrl.product.tags = $ctrl.checkedTags;
+		$ctrl.product.tags = $ctrl.checkedTags.length > 0 ? $ctrl.checkedTags : null;
 		$uibModalInstance.close($ctrl.product);
 	};
 
