@@ -305,24 +305,7 @@ angular.module('dajiaAdmin.controllers', []).run(function($rootScope) {
 	}
 
 	$scope.export = function() {
-		var exportConfig = {
-			resoruce : 'order',
-			recordLimit : -1
-		};
-		$http.post('/admin/export/', exportConfig).success(function(data, status, headers, config) {
-			var file = new Blob([ data ], {
-				type : 'application/vnd.ms-excel'
-			});
-			var fileURL = URL.createObjectURL(file);
-			var doc = document.createElement("a");
-			doc.href = fileURL;
-			doc.download = '订单.xls';
-			doc.click();
-			URL.revokeObjectURL(fileURL);
-
-		}).error(function(data, status, headers, config) {
-			console.log('request failed...');
-		});
+		window.location.href = './export/order';
 	}
 })
 
