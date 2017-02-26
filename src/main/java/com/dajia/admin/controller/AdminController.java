@@ -419,20 +419,30 @@ public class AdminController {
 		}
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("resource", resource);
-
+		
+		long currentTime = System.currentTimeMillis();
 		if (resource.equalsIgnoreCase("order")) {
+			long currentTimeInner = System.currentTimeMillis();
 			List<UserOrder> orders = orderService.loadAllValidOrders();
+			logger.info("1.1 loadAllValidOrders: " + (System.currentTimeMillis() - currentTimeInner) +" ms");
+			currentTimeInner = System.currentTimeMillis();
 			List<OrderVO> ovList = new ArrayList<>();
 			for (UserOrder order : orders) {
 				OrderVO ov = orderService.convertOrderVO(order);
 				orderService.fillOrderVO(ov, order);
 				ovList.add(ov);
 			}
+			logger.info("1.2 convertOrderVO: " + (System.currentTimeMillis() - currentTimeInner) +" ms");
 			model.put("data", ovList);
 			response.setContentType("application/vnd.ms-excel");
 			response.setHeader("Content-Disposition", "attachment; filename=orders.xls; charset=UTF-8");
 		}
-		return new ModelAndView(new ExportService(), model);
+		logger.info("1 get OrderVOList: " + (System.currentTimeMillis() - currentTime) +" ms");
+		currentTime = System.currentTimeMillis();
+		
+		ModelAndView mv = new ModelAndView(new ExportService(), model);
+		logger.info("2 generate Excel: " + (System.currentTimeMillis() - currentTime) +" ms");
+		return mv;
 	}
 	/*
 	 * @RequestMapping(value = "/smslogin", method = RequestMethod.POST) public
